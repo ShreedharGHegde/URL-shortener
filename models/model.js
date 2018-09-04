@@ -15,8 +15,9 @@ urlSchema = new Schema({
         required:true
     },
 
-    Tags:[{type:String,
-        required:true}],
+    Tags:{ 
+        type:[String] ,
+        required:true},
 
     CreatedAt:{type:Date, default:Date.now},
 

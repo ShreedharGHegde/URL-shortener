@@ -4,6 +4,8 @@ const {urls} = require('../models/model');      //loading model
 const router = express.Router();                //enabling router method
 const objectId = require('mongodb').ObjectId;               //destructuring objectId
 
+const shrturl = require('url');
+
 const hash = require('shorthash');              //loading shorthash package
 
 //find urls
@@ -36,16 +38,40 @@ router.get('/:id', (req, res) => {
 
 //find url by hash
 router.get('/hash/:hash', (req, res) => {
+
     let hash = req.params.hash;
-    urls.find({HashedUrl:hash}, function(err, urls){
-        res.send(urls);
+    urls.findOne({HashedUrl:hash}, function(err, url){
+        res.send(url);
     })
     .catch((err) => {
         send(err);
     })
 })
 
-//
+//find by tag
+router.get('/tag/:name', (req, res) => {
+    let tag = req.params.name;
+    urls.aggregate([{$match:{Tags:tag}}], function(err, url){
+        if(url.length == 0){
+            res.send({notice:'Tag not found'})
+        }else{
+            res.send(url)
+        }
+    })
+})
+
+//find by tags
+router.get('/tags/:name', (req, res) => {
+    let tag = req.query.name;
+    urls.aggregate([{$match:{Tags:tag}}], function(err, url){
+        if(url.length == 0){
+            res.send({notice:'Tag not found'})
+        }else{
+            res.send(url)
+        }
+    })
+}) 
+
 
 //create url
 router.post('/', (req, res) => {
