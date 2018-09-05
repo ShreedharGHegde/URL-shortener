@@ -1,16 +1,18 @@
-const express = require('express');              //loading express
-const _ = require('lodash');                    //loading lodash
-const {urls} = require('../models/model');      //loading model
-const router = express.Router();                //enabling router method
-const objectId = require('mongodb').ObjectId;               //destructuring objectId
+const express = require('express');              
+const _ = require('lodash');                   
+const {urls} = require('../models/model');     
+const router = express.Router();               
+const objectId = require('mongodb').ObjectId;              
 
 const shrturl = require('url');
 
-const hash = require('shorthash');              //loading shorthash package
+const hash = require('shorthash');             
+
+const useragent = require('useragent')
 
 //find urls
-router.get('/', (req, res) => {                  
-   
+router.get('/', (req, res) => {   
+
     urls.find().then((urls) => res.send({
         urls
     }))
@@ -78,9 +80,18 @@ router.post('/', (req, res) => {
     let doc = req.body;
     let body = _.pick(req.body,['Title','OriginalUrl','Tags']);
     let originalUrl = doc.OriginalUrl;
-    shortened = hash.unique(originalUrl);       //generating short url
+
+    let agent = useragent.lookup(req.headers['user-agent']);
+
     let url = new urls(body);
-    url.HashedUrl = shortened;                      //assining to urls
+
+    url.click.browser = agent.toAgent();
+    url.click.os = agent.os.family;
+    url.HashedUrl = hash.unique(originalUrl);                       //assining to url
+    url.click.device = agent.device.family;
+    url.click.clickedDateAndTime = Date();
+    url.click.userIpAddress = req.ip;
+
     url.save().then((url) => {                
         res.send({
             url
@@ -140,4 +151,4 @@ router.delete('/:id',(req, res) => {
 })
 
 
-module.exports = router;                //exporting router
+module.exports = router;      

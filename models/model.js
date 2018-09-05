@@ -23,12 +23,31 @@ urlSchema = new Schema({
 
     HashedUrl:{
         type:String
+    },
+
+    click:{
+        clickedDateAndTime:{
+        type:String
+    },
+    userIpAddress:{
+        type:String
+    },
+    browser:{
+        type:String
+    },
+    os:{
+        type:String
+    },
+    device:{
+        type:String
     }
+}
+    
 
 })
 
-const urls = mongoose.model('urls', urlSchema); //creating model
+const urls = mongoose.model('urls', urlSchema); 
 
-module.exports = {                              //exporting urls
+module.exports = {                            
     urls 
 }
